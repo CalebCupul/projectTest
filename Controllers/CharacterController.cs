@@ -10,20 +10,36 @@ namespace projectTest.Controllers
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase
     {
+        private readonly ICharacterService _characterService;
 
-        private static List<Character> characters = new List<Character>{
-            new Character(),
-            new Character { Name = "Sam", Id = 1}
-        };
+        public CharacterController(ICharacterService characterService)
+        {
+            _characterService = characterService;
+        }
 
         [HttpGet("GetAll")]
-        public ActionResult<List<Character>> Get(){
-            return Ok(characters);
+        public ActionResult<List<Character>> Get()
+        {
+            return Ok(_characterService.GetAllCharacters());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Character> GetSingle(int id){
-            return Ok(characters.FirstOrDefault(c => c.Id == id));
+        public ActionResult<Character> GetSingle(int id)
+        {
+            return Ok(_characterService.GetCharacterById(id));
         }
+
+        [HttpPost("AddCharacter")]
+        public ActionResult<List<Character>> AddCharacter(Character newCharacter)
+        {
+            return Ok(_characterService.AddCharacter(newCharacter));
+        }
+
+        [HttpPut("UpdateCharacter/{id}")]
+        public ActionResult<List<Character>> UpdateCharacter(int id, Character updatedCharacter)
+        {
+            return Ok(_characterService.UpdateCharacter(id, updatedCharacter));
+        }
+
     }
 }
