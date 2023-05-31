@@ -1,3 +1,4 @@
+global using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,26 +12,41 @@ namespace projectTest.Services.CharacterService
             new Character(),
             new Character { Name = "Sam", Id = 1}
         };
+        private readonly IMapper _mapper;
 
-        public List<Character> AddCharacter(Character newCharacter)
+        public CharacterService(IMapper mapper)
         {
-            characters.Add(newCharacter);
-            return characters;
+            _mapper = mapper;
         }
 
-        public List<Character> GetAllCharacters()
+        public async Task<ServiceResponse<List<GetCharacterDto>>> AddCharacter(AddCharacterDto newCharacter)
         {
-            return characters;
+            var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
+            var character = _mapper.Map<Character>(newCharacter);
+            character.Id = characters.Max(c => c.Id) + 1;
+            characters.Add(character);
+            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+            return serviceResponse;
         }
 
-        public Character GetCharacterById(int id)
+        public async Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
         {
-            // make it so if there no character with that id, return an exception with a message
-            return characters.FirstOrDefault(c => c.Id == id) ?? throw new Exception("Character not found");
+            var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
+            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+            return serviceResponse;
         }
 
-        public List<Character> UpdateCharacter(int id, Character updatedCharacter)
+        public async Task<ServiceResponse<GetCharacterDto>> GetCharacterById(int id)
         {
+            var serviceResponse = new ServiceResponse<GetCharacterDto>();
+            serviceResponse.Data = _mapper.Map<GetCharacterDto>(characters.FirstOrDefault(c => c.Id == id));
+            
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<Character>>> UpdateCharacter(int id, Character updatedCharacter)
+        {
+            var serviceResponse = new ServiceResponse<List<Character>>();
             Character character = characters.FirstOrDefault(c => c.Id == id);
             character.Name = updatedCharacter.Name;
             character.Class = updatedCharacter.Class;
@@ -38,7 +54,9 @@ namespace projectTest.Services.CharacterService
             character.HitPoints = updatedCharacter.HitPoints;
             character.Intelligence = updatedCharacter.Intelligence;
             character.Strength = updatedCharacter.Strength;
-            return characters;
+            serviceResponse.Data = characters;
+            return serviceResponse;
         }
     }
+   
 }

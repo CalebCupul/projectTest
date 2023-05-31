@@ -18,28 +18,27 @@ namespace projectTest.Controllers
         }
 
         [HttpGet("GetAll")]
-        public ActionResult<List<Character>> Get()
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> Get()
         {
-            return Ok(_characterService.GetAllCharacters());
+            return Ok(await _characterService.GetAllCharacters());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Character> GetSingle(int id)
+        public async Task<ActionResult<ServiceResponse<GetCharacterDto>>> GetSingle(int id)
         {
-            return Ok(_characterService.GetCharacterById(id));
+            return Ok(await _characterService.GetCharacterById(id));
         }
 
         [HttpPost("AddCharacter")]
-        public ActionResult<List<Character>> AddCharacter(Character newCharacter)
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDto>>>> AddCharacter(AddCharacterDto newCharacter)
         {
-            return Ok(_characterService.AddCharacter(newCharacter));
+            return Ok(await _characterService.AddCharacter(newCharacter));
         }
 
         [HttpPut("UpdateCharacter/{id}")]
-        public ActionResult<List<Character>> UpdateCharacter(int id, Character updatedCharacter)
+            public async Task<ActionResult<ServiceResponse<List<Character>>>> UpdateCharacter(int id, Character updatedCharacter)
         {
-            return Ok(_characterService.UpdateCharacter(id, updatedCharacter));
+            return Ok(await _characterService.UpdateCharacter(id, updatedCharacter));
         }
-
     }
 }
