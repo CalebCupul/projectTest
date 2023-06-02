@@ -40,23 +40,59 @@ namespace projectTest.Services.CharacterService
         {
             var serviceResponse = new ServiceResponse<GetCharacterDto>();
             serviceResponse.Data = _mapper.Map<GetCharacterDto>(characters.FirstOrDefault(c => c.Id == id));
-            
+
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Character>>> UpdateCharacter(int id, Character updatedCharacter)
+        public async Task<ServiceResponse<List<GetCharacterDto>>> UpdateCharacter(UpdateCharacterDto updatedCharacter)
         {
-            var serviceResponse = new ServiceResponse<List<Character>>();
-            Character character = characters.FirstOrDefault(c => c.Id == id);
-            character.Name = updatedCharacter.Name;
-            character.Class = updatedCharacter.Class;
-            character.Defense = updatedCharacter.Defense;
-            character.HitPoints = updatedCharacter.HitPoints;
-            character.Intelligence = updatedCharacter.Intelligence;
-            character.Strength = updatedCharacter.Strength;
-            serviceResponse.Data = characters;
+            var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
+            try
+            {
+                var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+
+                if (character is null)
+                {
+                    throw new Exception("Character not found");
+                }
+
+                character.Name = updatedCharacter.Name;
+                character.Class = updatedCharacter.Class;
+                character.Defense = updatedCharacter.Defense;
+                character.HitPoints = updatedCharacter.HitPoints;
+                character.Intelligence = updatedCharacter.Intelligence;
+                character.Strength = updatedCharacter.Strength;
+                serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
             return serviceResponse;
         }
+
+        public async Task<ServiceResponse<List<GetCharacterDto>>> DeleteCharacter(int id){
+            var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
+            try
+            {
+                var character = characters.First(c => c.Id == id);
+                if ( character is null)
+                {
+                    throw new Exception("Character not found");
+                }
+                
+                characters.Remove(character);
+                serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
     }
-   
+
 }
